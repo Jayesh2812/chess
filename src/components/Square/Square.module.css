@@ -1,0 +1,22 @@
+.square {
+    background-color: #759656;
+    aspect-ratio: 1;
+    width: 60px;
+    display: grid;
+    place-content: center;
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.white {
+    background-color: #EEEED2;
+    
+}
+
+.square span:focus{
+    outline: 1px solid red;
+    scale: 1.1;
+    transition: scale 200ms ease-out
+}
+
+
