@@ -9,10 +9,11 @@ import Image from "next/image";
 import { useStore } from "@/stores/global.store";
 
 interface ISquareProps {
-  rank: Rank;
-  file: File;
+  rank: number;
+  file: number;
   piece: string;
 }
+
 `
 white chess king	♔
 white chess queen	♕
@@ -34,12 +35,12 @@ const map = {
   B: "♗",
   N: "♘",
   P: "♙",
-  "-K": "♚",
-  "-Q": "♛",
-  "-R": "♜",
-  "-B": "♝",
-  "-N": "♞",
-  "-P": "♟︎",
+  k: "♚",
+  q: "♛",
+  r: "♜",
+  b: "♝",
+  n: "♞",
+  p: "♟︎",
 };
 
 const iMap = {
@@ -49,18 +50,19 @@ const iMap = {
   B: <img src={"/pieces/whiteBishop.svg"} alt={"whiteBishop"} />,
   N: <img src={"/pieces/whiteKnight.svg"} alt={"whiteKnight"} />,
   P: <img src={"/pieces/whitePawn.svg"} alt={"whitePawn"} />,
-  "-K": <img src={"/pieces/blackKing.svg"} alt={"blackKing"} />,
-  "-Q": <img src={"/pieces/blackQueen.svg"} alt={"blackQueen"} />,
-  "-R": <img src={"/pieces/blackRook.svg"} alt={"blackRook"} />,
-  "-B": <img src={"/pieces/blackBishop.svg"} alt={"blackBishop"} />,
-  "-N": <img src={"/pieces/blackKnight.svg"} alt={"blackKnight"} />,
-  "-P": <img src={"/pieces/blackPawn.svg"} alt={"blackPawn"} />,
+  k: <img src={"/pieces/blackKing.svg"} alt={"blackKing"} />,
+  q: <img src={"/pieces/blackQueen.svg"} alt={"blackQueen"} />,
+  r: <img src={"/pieces/blackRook.svg"} alt={"blackRook"} />,
+  b: <img src={"/pieces/blackBishop.svg"} alt={"blackBishop"} />,
+  n: <img src={"/pieces/blackKnight.svg"} alt={"blackKnight"} />,
+  p: <img src={"/pieces/blackPawn.svg"} alt={"blackPawn"} />,
 };
 
 function Square({ file, rank, piece }: ISquareProps) {
   const tempMove = useStore((state) => state.tempMove);
   const setFocusedSquare = useStore((state) => state.setFocusedSquare);
   const focusedSquare = useStore((state) => state.focusedSquare);
+  const getPiecesBetween = useStore((state) => state.getPiecesBetween);
 
   const isBlack = (rank + (file % 2)) % 2;
 
@@ -70,31 +72,37 @@ function Square({ file, rank, piece }: ISquareProps) {
       isDragging: !!monitor.isDragging(),
     }),
     item: {
-      type: piece,
+      piece,
       rank,
       file,
     },
   }));
 
-  const [, drop] = useDrop(() => ({
+  const [, drop] = useDrop<ISquareProps>(() => ({
     accept: "K",
-    collect(monitor) {
-      console.log(monitor.canDrop());
-    },
+    collect(monitor) {},
     drop: (item, monitor) => {
       console.log(item, file, rank);
-      tempMove({ from: { rank: item.rank, file: item.file }, to: {file, rank} });
+      const from = { rank: item.rank, file: item.file };
+      const to = { file, rank };
+      
+      tempMove({ from, to });
     },
   }));
 
   return (
-    <div ref={drop} className={cx(styles.square, { [styles.white]: !isBlack })} onClick={() => {
-      if(!focusedSquare) return
-      if(focusedSquare.rank === rank && focusedSquare.file === file) return
-      tempMove({from: focusedSquare, to: {rank, file}})
-
-    }}>
-      <span tabIndex={-1}
+    <div
+      ref={drop}
+      className={cx(styles.square, { [styles.white]: !isBlack })}
+      onClick={() => {
+        if (!focusedSquare) return;
+        if (focusedSquare.rank === rank && focusedSquare.file === file) return;
+        tempMove({ from: focusedSquare, to: { rank, file } });
+        setFocusedSquare(null);
+      }}
+    >
+      <span
+        tabIndex={-1}
         style={{
           opacity: isDragging ? 0.5 : 1,
           fontSize: 25,
@@ -102,7 +110,10 @@ function Square({ file, rank, piece }: ISquareProps) {
           cursor: "move",
           transform: "translate(0, 0)",
         }}
-        onClick={(e) => {setFocusedSquare({rank, file}); e.stopPropagation()}}
+        onClick={(e) => {
+          setFocusedSquare({ rank, file });
+          e.stopPropagation();
+        }}
         ref={drag}
       >
         {iMap[piece]}

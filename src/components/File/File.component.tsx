@@ -10,9 +10,6 @@ interface IFileProps {
 function File({ file }: IFileProps) {
   return (
     <div className={styles.file}>
-      {RANKS.map((rank) => (
-        <Square rank={rank} file={file} />
-      ))}
     </div>
   );
 }
