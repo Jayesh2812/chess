@@ -26,7 +26,7 @@ function Chess() {
 
         {boardState.map((row, rank) => {
           return (
-            <div style={{ display: "flex" }}>
+            <div style={{ display: "flex" }} key={rank}>
               {row.map((piece, file) => {
                 return (
                   <Square

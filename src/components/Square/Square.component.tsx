@@ -116,6 +116,7 @@ function Square({ file, rank, piece }: ISquareProps) {
         }}
         ref={drag}
       >
+        {/* @ts-ignore */}
         {iMap[piece]}
       </span>
     </div>
