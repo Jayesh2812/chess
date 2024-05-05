@@ -1,23 +1,48 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import React, { useEffect } from "react";
+import Square from "@/components/Square/Square.component";
+import { FILES } from "@/constants";
+import File from "@/components/File/File.component";
+import { useStore } from "@/stores/global.store";
+import { useShallow } from "zustand/react/shallow";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
-export default function Home() {
+
+function Chess() {
+  const moves = useStore((state) => state.moves);
+  const boardState = useStore(state => state.boardState)
+
+  useEffect(() => {
+    console.log("🚀 ~ file: page.tsx:18 ~ useEffect ~ boardState:", boardState)
+  }, [boardState])
+
   return (
-    <div>
-      <img src="./pieces/whitePawn.svg" alt="" />
-      <img src="./pieces/whiteKing.svg" alt="" />
-      <img src="./pieces/whiteQueen.svg" alt="" />
-      <img src="./pieces/whiteRook.svg" alt="" />
-      <img src="./pieces/whiteBishop.svg" alt="" />
-      <img src="./pieces/whiteKnight.svg" alt="" />
-      <img src="./pieces/whitePawn.svg" alt="" />
+    <DndProvider backend={HTML5Backend}>
+      <div className={"chessboard"}>
+        {/* {FILES.map((file) => (
+        <File file={file} />
+      ))} */}
 
-      <img src="./pieces/blackPawn.svg" alt="" />
-      <img src="./pieces/blackKing.svg" alt="" />
-      <img src="./pieces/blackQueen.svg" alt="" />
-      <img src="./pieces/blackRook.svg" alt="" />
-      <img src="./pieces/blackBishop.svg" alt="" />
-      <img src="./pieces/blackKnight.svg" alt="" />
-    </div>
+        {boardState.map((row, rank) => {
+          return (
+            <div style={{ display: "flex" }} key={rank}>
+              {row.map((piece, file) => {
+                return (
+                  <Square
+                    file={file + 1}
+                    rank={rank + 1}
+                    piece={piece}
+                    key={`${file}${piece}${rank}`}
+                  ></Square>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+    </DndProvider>
   );
 }
+
+export default Chess;
