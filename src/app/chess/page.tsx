@@ -33,7 +33,6 @@ function Chess() {
                     file={file + 1}
                     rank={rank + 1}
                     piece={piece}
-                    
                     key={`${file}${piece}${rank}`}
                   ></Square>
                 );
